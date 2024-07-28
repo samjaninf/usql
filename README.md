@@ -50,13 +50,14 @@ for other databases.
 ## Installing
 
 `usql` can be installed [via Release][], [via Homebrew][], [via AUR][], [via
-Scoop][] or [via Go][]:
+Scoop][], [via Go][], or [via Docker][]:
 
 [via Release]: #installing-via-release
 [via Homebrew]: #installing-via-homebrew-macos-and-linux
 [via AUR]: #installing-via-aur-arch-linux
 [via Scoop]: #installing-via-scoop-windows
 [via Go]: #installing-via-go
+[via Docker]: #installing-via-docker
 
 ### Installing via Release
 
@@ -137,6 +138,45 @@ $ go install -tags most github.com/xo/usql@latest
 ```
 
 See [below for information](#building) on `usql` build tags.
+
+### Installing via Docker
+
+An [official container image (`docker.io/usql/usql`)][docker-hub] is maintained
+by the `usql` team, and can be used with Docker, Podman, or other container
+runtime.
+
+[docker-hub]: https://hub.docker.com/r/usql/usql
+
+Install `usql` with Docker, Podman, or other container runtime:
+
+```sh
+# run interactive shell and mount the $PWD/data directory as a volume for use
+# within the container
+$ docker run --rm -it --volume $(pwd)/data:/data docker.io/usql/usql:latest sqlite3://data/test.db
+Trying to pull docker.io/usql/usql:latest...
+Getting image source signatures
+Copying blob af48168d69d8 done   |
+Copying blob efc2b5ad9eec skipped: already exists
+Copying config 917ceb411d done   |
+Writing manifest to image destination
+Connected with driver sqlite3 (SQLite3 3.45.1)
+Type "help" for help.
+
+sq:data/test.db=> \q
+
+# run postgres locally
+$ docker run --detach --rm --name=postgres --publish=5432:5432 --env=POSTGRES_PASSWORD=P4ssw0rd docker.io/usql/postgres
+
+# connect to local postgres instance
+$ docker run --rm --network host -it docker.io/usql/usql:latest postgres://postgres:P4ssw0rd@localhost
+Connected with driver postgres (PostgreSQL 16.3 (Debian 16.3-1.pgdg120+1))
+Type "help" for help.
+
+pg:postgres@localhost=> \q
+
+# run specific usql version
+$ docker run --rm -it docker.io/usql/usql:0.19.3
+```
 
 ## Building
 
